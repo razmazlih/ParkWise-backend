@@ -18,10 +18,11 @@ class ParkingArea(models.Model):
         help_text="Enter a number between 1 and 1000",
     )
     available_places = models.IntegerField(editable=False, default=0)
+    available_accessible = models.IntegerField(editable=False, default=0)
 
-    def update_available_places(self):
-        occupied_count = self.parking_spots.filter(occupied=True).count()
-        self.available_places = self.max_places - occupied_count
+    def update_available(self):
+        self.available_places = self.parking_spots.filter(occupied=False, accessible=False).count()
+        self.available_accessible = self.parking_spots.filter(occupied=False, accessible=True).count()
         self.save()
 
     def clean(self):
@@ -47,7 +48,7 @@ class ParkingSpot(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        self.area.update_available_places()
+        self.area.update_available()
 
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)

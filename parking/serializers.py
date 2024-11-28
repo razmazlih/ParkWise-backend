@@ -19,6 +19,7 @@ class ParkingAreaSerializer(serializers.ModelSerializer):
             "address",
             "max_places",
             "available_places",
+            "available_accessible",
             "parking_spots",
             "occupancy_rate",
         ]

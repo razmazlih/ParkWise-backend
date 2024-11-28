@@ -3,7 +3,7 @@ from .models import ParkingArea, ParkingSpot
 
 @admin.register(ParkingArea)
 class ParkingAreaAdmin(admin.ModelAdmin):
-    list_display = ('name', 'city', 'address', 'max_places', 'available_places')
+    list_display = ('name', 'city', 'address', 'max_places', 'available_places', 'available_accessible')
     search_fields = ('name', 'city', 'address')
     list_filter = ('city',)
 
