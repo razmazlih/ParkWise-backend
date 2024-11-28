@@ -33,8 +33,10 @@ class ParkingAreaSerializer(serializers.ModelSerializer):
 
 
 class ParkingSpotSerializer(serializers.ModelSerializer):
-    area = serializers.StringRelatedField()
+    area = serializers.PrimaryKeyRelatedField(
+        queryset=ParkingArea.objects.all()
+    )
 
     class Meta:
         model = ParkingSpot
-        fields = ["id", "place_position", "occupied", "area"]
+        fields = ["id", "place_position", "occupied", "accessible", "area"]

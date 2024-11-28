@@ -1,7 +1,13 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.forms import ValidationError
+import re
 
+def validate_place_position(value):
+    if not re.match(r"^[A-Z][0-9]+$", value):
+        raise ValidationError(
+            f"{value} is not a valid place position. It must start with a letter followed by numbers."
+        )
 
 class ParkingArea(models.Model):
     name = models.CharField(max_length=100)
@@ -11,7 +17,7 @@ class ParkingArea(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(1000)],
         help_text="Enter a number between 1 and 1000",
     )
-    available_places = models.IntegerField(editable=False)
+    available_places = models.IntegerField(editable=False, default=0)
 
     def update_available_places(self):
         occupied_count = self.parking_spots.filter(occupied=True).count()
@@ -32,11 +38,20 @@ class ParkingArea(models.Model):
 
 
 class ParkingSpot(models.Model):
-    place_position = models.CharField(max_length=5)
+    place_position = models.CharField(max_length=5 ,validators=[validate_place_position])
     occupied = models.BooleanField(default=False)
+    accessible = models.BooleanField(default=False)
     area = models.ForeignKey(
         ParkingArea, on_delete=models.CASCADE, related_name="parking_spots"
     )
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.area.update_available_places()
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        self.area.update_available_places()
+
     def __str__(self):
-        return self.place_position
+        return f"{self.place_position} - occupied: {self.occupied}, accessible: {self.accessible}"
