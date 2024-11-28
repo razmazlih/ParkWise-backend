@@ -11,7 +11,12 @@ class ParkingArea(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(1000)],
         help_text="Enter a number between 1 and 1000",
     )
-    available_places = models.IntegerField(validators=[MinValueValidator(0)])
+    available_places = models.IntegerField(editable=False)
+
+    def update_available_places(self):
+        occupied_count = self.parking_spots.filter(occupied=True).count()
+        self.available_places = self.max_places - occupied_count
+        self.save()
 
     def clean(self):
         if self.available_places > self.max_places:
