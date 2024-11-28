@@ -1,3 +1,22 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.forms import ValidationError
 
-# Create your models here.
+
+class ParkingArea(models.Model):
+    city = models.CharField(max_length=25)
+    address = models.CharField(max_length=50)
+    max_places = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(1000)],
+        help_text="Enter a number between 1 and 1000",
+    )
+    available_places = models.IntegerField(
+        validators=[MinValueValidator(0)]
+    )
+
+    def clean(self):
+        if self.available_places > self.max_places:
+            raise ValidationError({'available_places': 'Available places must not exceed max places.'})
+
+    class Meta:
+        unique_together = ("city", "address")
