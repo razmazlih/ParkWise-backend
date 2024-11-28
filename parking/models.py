@@ -20,3 +20,9 @@ class ParkingArea(models.Model):
 
     class Meta:
         unique_together = ("city", "address")
+
+
+class ParkingSpot(models.Model):
+    place_position = models.CharField(max_length=5)
+    occupied = models.BooleanField(default=False)
+    area = models.ForeignKey(ParkingArea, on_delete=models.CASCADE, related_name='parking_spots')
