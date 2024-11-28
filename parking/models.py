@@ -4,6 +4,7 @@ from django.forms import ValidationError
 
 
 class ParkingArea(models.Model):
+    name = models.CharField(max_length=100)
     city = models.CharField(max_length=25)
     address = models.CharField(max_length=50)
     max_places = models.IntegerField(
@@ -21,8 +22,14 @@ class ParkingArea(models.Model):
     class Meta:
         unique_together = ("city", "address")
 
+    def __str__(self):
+        return self.name
+
 
 class ParkingSpot(models.Model):
     place_position = models.CharField(max_length=5)
     occupied = models.BooleanField(default=False)
     area = models.ForeignKey(ParkingArea, on_delete=models.CASCADE, related_name='parking_spots')
+
+    def __str__(self):
+        return self.place_position
