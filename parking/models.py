@@ -3,33 +3,31 @@ from django.db import models
 from django.forms import ValidationError
 import re
 
+
 def validate_place_position(value):
     if not re.match(r"^[A-Z][0-9]+$", value):
         raise ValidationError(
             f"{value} is not a valid place position. It must start with a letter followed by numbers."
         )
 
+
 class ParkingArea(models.Model):
     name = models.CharField(max_length=100)
     city = models.CharField(max_length=25)
     address = models.CharField(max_length=50)
-    max_places = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(1000)],
-        help_text="Enter a number between 1 and 1000",
-    )
+    max_places = models.IntegerField(editable=False, default=0)
     available_places = models.IntegerField(editable=False, default=0)
     available_accessible = models.IntegerField(editable=False, default=0)
 
     def update_available(self):
-        self.available_places = self.parking_spots.filter(occupied=False, accessible=False).count()
-        self.available_accessible = self.parking_spots.filter(occupied=False, accessible=True).count()
+        self.available_places = self.parking_spots.filter(
+            occupied=False, accessible=False
+        ).count()
+        self.available_accessible = self.parking_spots.filter(
+            occupied=False, accessible=True
+        ).count()
+        self.max_places = self.parking_spots.count()
         self.save()
-
-    def clean(self):
-        if self.available_places > self.max_places:
-            raise ValidationError(
-                {"available_places": "Available places must not exceed max places."}
-            )
 
     class Meta:
         unique_together = ("city", "address")
@@ -39,7 +37,9 @@ class ParkingArea(models.Model):
 
 
 class ParkingSpot(models.Model):
-    place_position = models.CharField(max_length=5 ,validators=[validate_place_position])
+    place_position = models.CharField(
+        max_length=5, validators=[validate_place_position]
+    )
     occupied = models.BooleanField(default=False)
     accessible = models.BooleanField(default=False)
     area = models.ForeignKey(
