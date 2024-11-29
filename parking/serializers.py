@@ -15,6 +15,7 @@ class ParkingAreaSerializer(serializers.ModelSerializer):
         model = ParkingArea
         fields = [
             "id",
+            "name",
             "city",
             "address",
             "max_places",
