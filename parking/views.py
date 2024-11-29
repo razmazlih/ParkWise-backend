@@ -16,6 +16,6 @@ class ParkingSpotViewSet(ModelViewSet):
 
     @action(detail=False, methods=['get'], url_path='by-area/(?P<area_id>\d+)')
     def spots_by_area(self, request, area_id=None):
-        spots = self.queryset.filter(parking_area_id=area_id)
+        spots = self.queryset.filter(area=area_id)
         serializer = self.serializer_class(spots, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
