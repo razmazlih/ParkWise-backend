@@ -52,7 +52,7 @@ class ParkingSpot(models.Model):
 
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
-        self.area.update_available_places()
+        self.area.update_available()
 
     def __str__(self):
         return f"{self.place_position} - occupied: {self.occupied}, accessible: {self.accessible}"
